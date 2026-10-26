@@ -1,5 +1,5 @@
 # Streaming Network Traffic Monitor
-
+contributors: Bliss, Paulina, Tapuwa
 ## Project Description
 
 A menu-driven C++ program that processes network traffic records as a stream. It identifies the most active devices, detects new and repeated connections, and flags devices with a sudden spike in new connections. Exact data structures (hash table, min-heap) are compared with approximate ones (Count-Min Sketch, Bloom filter) on memory, speed, and error.

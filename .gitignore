@@ -1,0 +1,7 @@
+data/
+results/
+monitor
+run_tests
+*.exe
+*.o
+.vscode/

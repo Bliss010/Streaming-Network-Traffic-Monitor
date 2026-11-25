@@ -1,49 +1,11 @@
-# Streaming Network Traffic Monitor
+# Exact frequency counting — Iteration 3 component
+Compile: `g++ -std=c++11 -Wall -Wextra -pedantic exact.cpp test_exact.cpp -o test_exact`
+Run: `./test_exact`
 
-## Project Description
+Integration: include exact.h and compile exact.cpp with the team application. Create a HashTable instance and call hashUpdate(record.src_ip) once per valid record. For ranking, allocate an Entry array of at least min(k, uniqueCount()) elements for positive k, and call topK(k, output, length). Results are descending by count, then ascending by string key. Negative or zero k returns no results; the menu should reject invalid k and retain the old setting. Do not compile test_exact.cpp with the team's main.cpp (both define main).
 
-A menu-driven C++ program that processes network traffic records as a stream. It identifies the most active devices, detects new and repeated connections, and flags devices with a sudden spike in new connections. Exact data structures (hash table, min-heap) are compared with approximate ones (Count-Min Sketch, Bloom filter) on memory, speed, and error. contributors: Bliss, Paulina, Tapuwa
+Design: custom chained hash table and custom array min-heap, no standard container classes. The heap is rebuilt on request from final exact counts, an alternative explicitly allowed in Iteration 2. heapUpdateTopK expects each distinct key only once per heap build, not once per stream record. CSV parsing, connection-pair tracking, menu integration and approximate structures are not tested here. The table uses fixed bucket count; performance degrades with long chains. Counts use int. Tests use synthetic source strings rather than the team's CSV files.
 
-## Build Instructions
+Complexity: with n records, m distinct sources, B buckets and r=min(k,m), expected counting time O(n(1+m/B)) under uniform hashing, worst case O(nm). Top-k time O(B+m log(r+1)), including extraction; space O(B+m+r), assuming bounded key length. A bounded load factor gives expected O(n) counting.
 
-Requires g++ with C++17 support.
-
-```
-g++ -std=c++17 -Wall -O2 -o monitor src/*.cpp
-```
-
-## Run Instructions
-
-```
-./monitor
-```
-
-On Windows, run `monitor.exe`. Use the menu to load a data file, configure settings, process the stream, and export results to CSV.
-
-## Current Progress
-
-**Iteration 1: Complete**
-- Program design, pseudocode, and testing plan
-
-**Iteration 2: In Progress**
-- Stream parser, hash table, and min-heap
-- Count-Min Sketch and Bloom filter
-- Spike detection, benchmarking, and CSV export
-
-A C++ streaming monitor that detects unusual network activity using exact and approximate data structures.
-
-## Data Structures
-
-| Structure | Type | Purpose |
-|---|---|---|
-| Hash table | Exact | Per-device counts and connection tracking |
-| Min-heap | Exact | Top-k most active devices |
-| Count-Min Sketch | Approximate | Per-device count estimates in fixed memory |
-| Bloom filter | Approximate | Seen-before checks in fixed memory |
-
-All structures are implemented from scratch.
-
-
-
-On Windows, run `monitor.exe`. Then use the menu to open a data file, choose settings, run the stream, and save results to CSV.
-
+Bug reproduction: removing the tie condition in worse() caused the tie test to fail when B arrived before A in the heap scan. Restoring the condition makes A win equal counts. See bug_before.txt and test_results.txt.
